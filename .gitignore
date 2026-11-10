@@ -1,0 +1,23 @@
+# 本地配置和凭据；仅提交不含真实值的配置样例。
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+
+# 可重建的依赖、缓存和构建结果。
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+dist/
+build/
+*.log
+.DS_Store
+
+# 离线备份应保存在仓库外，避免再次提交。
+/backups/
+*.bundle
