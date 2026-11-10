@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#146c57"><title>今天的小清单</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f1;color:#193e34;font-family:system-ui,-apple-system,sans-serif}main{max-width:580px;margin:auto;padding:calc(36px + env(safe-area-inset-top)) 20px 40px}header{margin-bottom:30px}.tag{font-size:13px;letter-spacing:2px;color:#57786c}h1{font-size:34px;margin:12px 0}header p{color:#61736b;line-height:1.7}section{background:white;border:1px solid #e0e8de;border-radius:24px;padding:20px;box-shadow:0 12px 40px #234a3210}form{display:flex;gap:10px}input[type=text]{width:100%;min-width:0;border:1px solid #c3d4c9;border-radius:12px;padding:14px 12px;font:inherit;font-size:16px}button{font:inherit;min-height:46px;cursor:pointer;border:0;border-radius:12px;padding:10px 16px;background:#146c57;color:white;flex-shrink:0}button:focus-visible,input:focus-visible{outline:3px solid #dbb656;outline-offset:3px}.summary{font-size:14px;color:#61736b;margin:22px 0 10px}ul{padding:0;margin:0;list-style:none}li{display:flex;align-items:center;gap:10px;border-top:1px solid #edf0eb;padding:14px 0}label{display:flex;align-items:center;gap:12px;flex:1;min-width:0;line-height:1.5}input[type=checkbox]{width:24px;height:24px;accent-color:#146c57;flex-shrink:0}label span{overflow-wrap:anywhere}.done span{text-decoration:line-through;color:#7c8983}.delete{background:#f8eeea;color:#98533e;padding:10px 12px}.empty{text-align:center;padding:36px 10px;color:#78877d}.notice{font-size:13px;line-height:1.8;color:#64776c;margin:20px 4px}#status{font-size:13px;color:#8b4934;line-height:1.7}footer{font-size:12px;color:#819086;margin-top:28px;text-align:center}@media(max-width:350px){main{padding-left:12px;padding-right:12px}section{padding:14px}button{padding:10px}}
+</style></head>
+<body><main><header><div class="tag">留一点空间，给今天</div><h1>今天的小清单</h1><p>把要做的事写下来，一件一件慢慢完成。</p></header>
+<section aria-label="待办清单"><form id="form"><input id="task" type="text" maxlength="200" placeholder="例如：给小花浇水" aria-label="新待办事项" autocomplete="off" required><button type="submit">新增</button></form><p class="summary" id="summary" aria-live="polite"></p><ul id="list"></ul><p class="empty" id="empty">还没有待办，写下今天的第一件小事吧。</p><p id="status" role="status"></p></section>
+<p class="notice">自动保存在当前浏览器中。请使用同一浏览器和网址继续查看；清理网站数据或使用无痕模式可能丢失记录，不会跨设备同步。</p><footer>手机开发验证项目 · 无需注册 · 无付费 API</footer></main>
+<script>
+'use strict';
+const key='iphone-codex-todo-v1';
+const list=document.querySelector('#list'), status=document.querySelector('#status'), input=document.querySelector('#task');
+let tasks=[];
+try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(saved)||!saved.every(t=>t&&typeof t.id==='string'&&typeof t.text==='string'&&typeof t.done==='boolean'))throw Error();tasks=saved;}catch{status.textContent='无法读取已保存的数据。你仍可使用清单；原数据不会自动覆盖。';}
+function save(){try{localStorage.setItem(key,JSON.stringify(tasks));status.textContent='';}catch{status.textContent='浏览器未能保存数据，刷新后可能丢失。';}}
+function render(){list.replaceChildren();for(const task of tasks){const li=document.createElement('li'),label=document.createElement('label'),check=document.createElement('input'),span=document.createElement('span'),del=document.createElement('button');check.type='checkbox';check.checked=task.done;label.className=task.done?'done':'';span.textContent=task.text;check.addEventListener('change',()=>{task.done=check.checked;save();render();});del.type='button';del.className='delete';del.textContent='删除';del.setAttribute('aria-label','删除：'+task.text);del.addEventListener('click',()=>{tasks=tasks.filter(t=>t.id!==task.id);save();render();});label.append(check,span);li.append(label,del);list.append(li);}document.querySelector('#summary').textContent=`共 ${tasks.length} 项 · 已完成 ${tasks.filter(t=>t.done).length} 项`;document.querySelector('#empty').hidden=tasks.length>0;}
+document.querySelector('#form').addEventListener('submit',e=>{e.preventDefault();const text=input.value.trim();if(!text){input.value='';input.focus();return;}tasks.push({id:crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random(),text,done:false});save();render();input.value='';input.focus();});render();
+</script></body></html>
